@@ -2,7 +2,7 @@
 
 Connect to Model Context Protocol servers and use their tools in your workflows.
 
-MCP (Model Context Protocol) is a standard for exposing tools and resources to LLMs. MCP servers provide tools over stdio, SSE, or WebSockets. This library converts MCP tools into native tool definitions that work with your workflows.
+MCP (Model Context Protocol) is a standard for exposing tools and resources to LLMs. MCP servers provide tools over stdio, SSE, or Streamable HTTP. This library converts MCP tools into native tool definitions that work with your workflows.
 
 ## Basic Usage
 
