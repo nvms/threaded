@@ -136,6 +136,7 @@ This is useful for understanding what the model actually generated.
 ### As File
 
 ```typescript
+import { generateImage } from "@threaded/ai";
 import { writeFileSync } from "fs";
 
 const result = await generateImage("openai/gpt-image-1.5", "prompt");

@@ -232,26 +232,26 @@ const result = await thread.generate(workflow);
 - Scheduled tasks that analyze conversation history
 - Background processing that updates thread state
 
-**Example - scheduled summary:**
+**Example - autonomous agent step:**
 ```typescript
-import { getOrCreateThread, model } from "@threaded/ai";
+import { getOrCreateThread, compose, scope, model } from "@threaded/ai";
 
-const thread = getOrCreateThread("support-ticket-123");
+const thread = getOrCreateThread("research-agent");
 
-setInterval(async () => {
-  const history = await thread.store.get("support-ticket-123");
+const step = compose(
+  scope(
+    {
+      system: "you are a research agent. review your previous findings and decide what to investigate next.",
+      tools: [searchWeb, readUrl, saveNote],
+    },
+    model({ model: "openai/gpt-4o" }),
+  ),
+);
 
-  if (history.length > 20) {
-    await thread.generate(
-      model({
-        system: "summarize the conversation and add it to history as an assistant message",
-      })
-    );
-  }
-}, 60000);
+await thread.generate(step);
 ```
 
-The model generates a summary based on history without needing a user message.
+The agent reviews its history and takes action without needing a user message.
 
 ## Accessing Thread History Directly
 

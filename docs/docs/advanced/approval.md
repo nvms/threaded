@@ -4,41 +4,6 @@ Require user approval before executing tools.
 
 Tool approval lets you intercept tool calls before execution and decide whether to allow or deny them. This is useful for dangerous operations or interactive agents.
 
-## Basic Approval with Callback
-
-A simple approval callback that runs synchronously.
-
-!!! note tip
-    This is a contrived example that just blocks a tool immediately. In practice, you would want to actually ask for approval instead of hardcoding decisions. See [web app approval](#web-app-approval-sse) or [CLI approval](#cli-approval) for interactive approval patterns.
-
-```javascript
-// in your server or workflow code
-import { compose, model, scope } from "@threaded/ai";
-
-const workflow = compose(
-  scope(
-    {
-      tools: [fileDeleteTool, fileReadTool],
-      toolConfig: {
-        requireApproval: true,
-        approvalCallback: async (call) => {
-          if (call.function.name === "delete_file") {
-            console.log("blocking delete_file call");
-            return false;
-          }
-          return true;
-        },
-      },
-    },
-    model(),
-  ),
-);
-
-await workflow("delete config.json");
-```
-
-When the model tries to call `delete_file`, the approvalCallback receives the tool call object and returns false to deny it. The model receives an error message and continues.
-
 ## Web App Approval (SSE)
 
 This is how you build interactive approval for web apps. The server sends approval requests to the frontend via SSE, and the frontend sends the approval decision back via POST.
