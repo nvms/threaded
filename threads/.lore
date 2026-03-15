@@ -1,0 +1,133 @@
+-- composition --
+
+the core pattern is functional composition with immutable context:
+
+```js
+const workflow = compose(
+  scope({ tools: [searchTool], system: "you are a researcher" },
+    model({ model: "openai/gpt-4o-mini" })
+  ),
+  when(toolWasCalled("search"),
+    scope({ system: "summarize findings" }, model())
+  ),
+  tap(ctx => console.log(ctx.lastResponse?.content))
+)
+
+const result = await workflow("find info about X")
+```
+
+compose() chains steps. scope() isolates context. model() calls the LLM
+and auto-executes tool calls. when() branches conditionally. tap() runs
+side effects without modifying context.
+
+-- scope inheritance --
+
+scope uses bitwise flags to control what inner steps can see:
+
+Inherit.Nothing (0) - fresh context
+Inherit.Conversation (1) - carry message history
+Inherit.Tools (2) - carry tool definitions and call counts
+Inherit.All (3) - carry everything
+
+default is Inherit.Conversation for most uses. silent scopes execute
+tools but don't add to conversation history.
+
+-- providers --
+
+model string format is "provider/model-name":
+
+  model({ model: "openai/gpt-4o-mini" })
+  model({ model: "anthropic/claude-sonnet-4-5-20250929" })
+  model({ model: "google/gemini-2.0-flash" })
+
+API keys resolved in order: config.apiKey > setKeys() > env vars.
+each provider translates messages and tools to its own format internally.
+
+-- tools --
+
+tools are objects with name, description, schema, and execute:
+
+```js
+const searchTool = {
+  name: "search",
+  description: "search the web",
+  schema: { query: { type: "string", description: "search query" } },
+  execute: async ({ query }) => await search(query),
+  _maxCalls: 3,
+}
+```
+
+tool execution is automatic inside model(). when the LLM returns
+tool_calls, model() executes them, adds results to history, and calls
+the LLM again until no more tool_calls are returned.
+
+-- approval --
+
+tool approval is opt-in per scope:
+
+```js
+scope({
+  tools: [dangerousTool],
+  toolConfig: {
+    requireApproval: true,
+    approvalCallback: (call) => confirm(`Allow ${call.function.name}?`)
+  }
+}, model())
+```
+
+also supports event-driven approval for async UIs via
+onApprovalRequested/resolveApproval.
+
+-- structured output --
+
+pass a JSON schema or Zod schema to model():
+
+```js
+model({
+  model: "openai/gpt-4o-mini",
+  schema: z.object({ name: z.string(), age: z.number() })
+})
+```
+
+the library normalizes Zod schemas to JSON schema and passes them
+to the provider in the appropriate format.
+
+-- threads --
+
+threads provide persistent multi-turn conversations:
+
+```js
+const thread = getOrCreateThread("user-123")
+await thread.message("hello", compose(model()))
+await thread.message("remember what I said?", compose(model()))
+```
+
+pluggable storage via ThreadStore interface (get/set). default is
+in-memory.
+
+-- streaming --
+
+pass a stream callback to scope or model for real-time output:
+
+```js
+scope({ stream: (event) => {
+  if (event.type === "content") process.stdout.write(event.content)
+  if (event.type === "tool_executing") console.log("calling", event.call.function.name)
+}}, model())
+```
+
+event types: content, tool_calls_ready, tool_executing, tool_complete,
+tool_error, approval_requested, usage.
+
+-- usage tracking --
+
+token usage accumulates through the pipeline:
+
+```js
+const result = await workflow("prompt")
+console.log(result.usage)
+// { promptTokens: 150, completionTokens: 42, totalTokens: 192 }
+```
+
+usage propagates through nested scopes, including silent scopes.
+each provider extracts usage from its response format.

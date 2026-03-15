@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>basic-chat</title>
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+  <body class="p6 sans">
+    <div class="f4 fw4">basic demo</div>
+    <div class="maxw18 f2 c-neutral-50-auto mt2">
+      In this basic example, the assistant replies will be streamed in. Tool
+      call information will also be streamed in. This is to show that even when
+      streaming is enabled and we're using the /v1/chat/completions API, we can
+      still execute multiple tool calls (in parallel or sequentially), in a
+      single request/response turn.
+    </div>
+    <div id="messages" class="sy2 mt6"></div>
+    <div class="mt6 df aic sx2">
+      <input
+        type="text"
+        id="input"
+        placeholder="Type a message..."
+        value="What's the current weather in Osaka Japan, Charlotte NC USA, and Nome Alaska USA?"
+        class="w18"
+      />
+      <button onclick="sendMessage()" class="btn-outline">Send</button>
+    </div>
+    <script src="/index.js"></script>
+  </body>
+</html>

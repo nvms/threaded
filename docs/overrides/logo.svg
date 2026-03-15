@@ -1,0 +1,8 @@
+<svg viewBox="20 20 60 60" xmlns="http://www.w3.org/2000/svg">
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M20 20H60V35H35V65H50V80H20V20ZM80 80H40V65H65V35H50V20H80V80Z"
+    fill="#ffffff"
+  />
+</svg>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>tool-approval</title>
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+  <body class="p6 sans">
+    <div class="f4 fw4">tool approval demo</div>
+    <div class="maxw18 f2 c-neutral-50-auto mt2">
+      In this example, you will be prompted for approval before executing each
+      tool call.
+    </div>
+    <div id="messages" class="sy2 mt6"></div>
+    <div class="mt6 df aic sx2">
+      <input
+        type="text"
+        id="input"
+        placeholder="Type a message..."
+        value="What's the current weather in Osaka Japan, Charlotte NC USA, and Nome Alaska USA?"
+        class="w18"
+      />
+      <button onclick="sendMessage()" class="btn-outline">Send</button>
+    </div>
+    <script src="/index.js"></script>
+  </body>
+</html>

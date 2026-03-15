@@ -1,0 +1,93 @@
+site_name: threads
+site_description: composable llm workflows for node.js
+site_url: https://nvms.github.io/threaded-ai
+repo_url: https://github.com/nvms/threaded-ai
+repo_name: nvms/threaded-ai
+
+plugins:
+  - search
+  - pygments:
+      light: xcode
+      dark: lightbulb
+  - llmstxt:
+      markdown_description: |
+        threads is a library for building composable LLM workflows in node.js.
+        it provides primitives for managing conversation history, tool execution,
+        and function composition. supports openai, anthropic, google, and xai models.
+        includes built-in streaming, tool approval, retry logic, thread persistence,
+        text embeddings, and image generation.
+      sections:
+        Getting Started:
+          - index.md: overview and core principles
+          - quick-start.md: installation and basic usage
+        Core Concepts:
+          - concepts/threads.md: thread management and persistence
+          - concepts/composition.md: composing workflows with compose, model, scope, when, tap, retry
+          - concepts/tools.md: defining and executing tools
+          - concepts/schemas.md: json schema output and validation
+        Advanced:
+          - advanced/mcp.md: model context protocol integration
+          - advanced/embedding.md: text embeddings
+          - advanced/image-generation.md: image generation with openai, xai, google
+          - advanced/approval.md: tool approval system
+          - advanced/helpers.md: utility functions
+
+theme:
+  name: material
+  custom_dir: overrides
+  logo: logo.svg
+  favicon: logo.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Home: index.md
+  - Quick Start: quick-start.md
+  - Core Concepts:
+    - Threads: concepts/threads.md
+    - Composition: concepts/composition.md
+    - Tools: concepts/tools.md
+    - Schemas: concepts/schemas.md
+  - Advanced:
+    - MCP Integration: advanced/mcp.md
+    - Embeddings: advanced/embedding.md
+    - Image Generation: advanced/image-generation.md
+    - Tool Approval: advanced/approval.md
+    - Helpers: advanced/helpers.md

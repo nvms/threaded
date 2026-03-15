@@ -1,0 +1,16 @@
+{
+  "name": "basic-chat",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@threaded/ai": "^1.0.1",
+    "express": "^5.1.0"
+  }
+}
