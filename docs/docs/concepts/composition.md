@@ -61,12 +61,13 @@ Useful for multi-tenant apps where each user has their own key.
 
 ```typescript
 const result = await model({
-  model: "openai/gpt-4o",
-  baseUrl: "https://my-proxy.example.com/v1",
+  model: "openai/anthropic/claude-sonnet-4-20250514",
+  apiKey: "sk-or-...",
+  baseUrl: "https://openrouter.ai/api/v1",
 })("explain quantum physics");
 ```
 
-Point to a proxy, gateway, or OpenAI-compatible API.
+The model string is split on the first `/` - `openai` tells threaded to use the OpenAI-compatible provider, and the rest (`anthropic/claude-sonnet-4-20250514`) is passed as the `model` field in the request body. This works with any OpenAI-compatible API like OpenRouter, Azure, or a local proxy.
 
 ### With System Message
 
