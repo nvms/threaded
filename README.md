@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.svg" width="80" height="80" alt="threads logo">
+  <img src=".github/logo.svg" width="80" height="80" alt="threads logo">
 </p>
 
 <h1 align="center">@threaded/ai</h1>
