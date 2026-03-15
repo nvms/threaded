@@ -165,7 +165,7 @@ Environment variables are detected automatically.
 |----------|---------|
 | openai | `OPENAI_API_KEY` |
 | xai | `XAI_API_KEY` |
-| google | `GEMINI_API_KEY` |
+| google | `GEMINI_API_KEY` or `GOOGLE_AI_API_KEY` |
 
 Or use `setKeys()` - see [quick start](../quick-start.md#api-keys).
 

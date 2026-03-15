@@ -12,7 +12,8 @@ const getApiKey = (provider: string): string => {
     return getKey(provider);
   } catch {
     const envVar = providerKeyEnvVars[provider];
-    const key = envVar ? process.env[envVar] || "" : "";
+    const fallbackEnvVar = provider === "google" ? "GOOGLE_AI_API_KEY" : undefined;
+    const key = envVar ? process.env[envVar] || (fallbackEnvVar ? process.env[fallbackEnvVar] : "") || "" : "";
     if (!key) throw new Error(`No API key found for provider: ${provider}`);
     return key;
   }

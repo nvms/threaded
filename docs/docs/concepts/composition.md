@@ -46,6 +46,28 @@ Supported providers:
 - anthropic: `anthropic/<model-identifier>`
 - google: `google/<model-identifier>`
 
+### With Custom API Key
+
+```typescript
+const result = await model({
+  model: "openai/gpt-4o",
+  apiKey: "sk-different-key",
+})("explain quantum physics");
+```
+
+Useful for multi-tenant apps where each user has their own key.
+
+### With Custom Base URL
+
+```typescript
+const result = await model({
+  model: "openai/gpt-4o",
+  baseUrl: "https://my-proxy.example.com/v1",
+})("explain quantum physics");
+```
+
+Point to a proxy, gateway, or OpenAI-compatible API.
+
 ### With System Message
 
 ```typescript

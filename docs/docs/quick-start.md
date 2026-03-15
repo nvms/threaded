@@ -140,5 +140,3 @@ const workflow = compose(
 
 await workflow("what's the weather?");
 ```
-
-Next: [Threads](concepts/threads.md)
