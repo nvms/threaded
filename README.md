@@ -68,7 +68,7 @@ model({ model: "local/llama2" })       // Ollama
 
 ## Documentation
 
-Full documentation is available at the [docs site](https://nvms.github.io/threads), or browse the `docs/` directory.
+Full documentation is available at the [docs site](https://nvms.github.io/threaded), or browse the `docs/` directory.
 
 ## Examples
 
