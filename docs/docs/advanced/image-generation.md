@@ -198,5 +198,3 @@ for (const { model, ext } of providers) {
 ```
 
 Generates the same prompt across multiple providers for comparison.
-
-next: [tool approval](approval.md)

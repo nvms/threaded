@@ -144,5 +144,3 @@ const workflow = model({
 ```
 
 Handles complex nested structures.
-
-next: [mcp integration](../advanced/mcp.md)

@@ -329,5 +329,3 @@ app.listen(3000);
 ```
 
 Each user gets their own thread. History persists in SQLite. All messages use the same workflow with tools.
-
-next: [composition](composition.md)

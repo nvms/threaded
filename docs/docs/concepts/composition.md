@@ -243,5 +243,3 @@ const workflow = compose(
 ```
 
 Composition lets you build complex agent behaviors from simple primitives.
-
-next: [tools](tools.md)

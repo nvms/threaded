@@ -37,7 +37,7 @@ Requires system dependencies (ONNX runtime).
 ## Semantic Search Example
 
 ```javascript
-import { embed } from "@threaded/ai";
+import { embed, cosineSimilarity } from "@threaded/ai";
 
 const documents = [
   "the cat sat on the mat",
@@ -49,23 +49,11 @@ const docVectors = await Promise.all(
   documents.map(doc => embed("openai/text-embedding-3-small", doc))
 );
 
-const query = "pets and animals";
-const queryVector = await embed("openai/text-embedding-3-small", query);
+const queryVector = await embed("openai/text-embedding-3-small", "pets and animals");
 
-const cosineSimilarity = (a, b) => {
-  const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
-  const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-  const magB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
-  return dot / (magA * magB);
-};
-
-const scores = docVectors.map((vec, i) => ({
-  document: documents[i],
-  score: cosineSimilarity(queryVector, vec),
-}));
-
-scores.sort((a, b) => b.score - a.score);
-console.log(scores);
+const scores = docVectors
+  .map((vec, i) => ({ document: documents[i], score: cosineSimilarity(queryVector, vec) }))
+  .sort((a, b) => b.score - a.score);
 ```
 
 Finds the most similar documents to a query.
@@ -80,5 +68,3 @@ const vector2 = await embed("Xenova/all-MiniLM-L6-v2", "text 2");
 ```
 
 The second call reuses the loaded model.
-
-next: [image generation](image-generation.md)

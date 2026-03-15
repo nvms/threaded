@@ -91,6 +91,10 @@ This is how you build interactive approval for web apps. The server sends approv
         });
       };
 
+      const send = (type, data) => {
+        res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`);
+      };
+
       const workflow = compose(
         scope(
           {
@@ -100,11 +104,22 @@ This is how you build interactive approval for web apps. The server sends approv
               approvalCallback,
             },
             stream: (event) => {
-              if (event.type === "content") {
-                res.write(`data: ${JSON.stringify({ type: "content", content: event.content })}\n\n`);
-              }
-              if (event.type === "tool_complete") {
-                res.write(`data: ${JSON.stringify({ type: "tool_complete", name: event.call.function.name, result: event.result })}\n\n`);
+              switch (event.type) {
+                case "content":
+                  send("content", { content: event.content });
+                  break;
+                case "tool_calls_ready":
+                  send("tool_calls", { calls: event.calls.map((c) => ({ id: c.id, name: c.function.name, arguments: c.function.arguments })) });
+                  break;
+                case "tool_executing":
+                  send("tool_executing", { id: event.call.id, name: event.call.function.name });
+                  break;
+                case "tool_complete":
+                  send("tool_complete", { id: event.call.id, name: event.call.function.name, result: event.result });
+                  break;
+                case "tool_error":
+                  send("tool_error", { id: event.call.id, name: event.call.function.name, error: event.error });
+                  break;
               }
             },
           },
@@ -140,36 +155,80 @@ This is how you build interactive approval for web apps. The server sends approv
 === "Frontend (client.js)"
 
     ```javascript
-    const eventSource = new EventSource(`/chat/user-123`);
+    const output = document.getElementById("output");
+    const pendingApprovals = [];
 
-    eventSource.onmessage = async (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.type === "tool_approval_required") {
-        const { toolName, arguments: args, approvalId } = data;
-
-        const userApproved = confirm(
-          `Allow ${toolName}?\nArguments: ${JSON.stringify(args, null, 2)}`
-        );
-
-        await fetch(`/approve/${approvalId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ approved: userApproved }),
-        });
+    function handleEvent(type, data) {
+      switch (type) {
+        case "content":
+          output.textContent += data.content;
+          break;
+        case "tool_calls":
+          for (const call of data.calls) {
+            console.log(`tool requested: ${call.name}`);
+          }
+          break;
+        case "tool_approval_required":
+          pendingApprovals.push(data);
+          showApprovalDialog(data);
+          break;
+        case "tool_executing":
+          console.log(`executing ${data.name}...`);
+          break;
+        case "tool_complete":
+          console.log(`${data.name} result:`, data.result);
+          break;
+        case "tool_error":
+          console.log(`${data.name} failed:`, data.error);
+          break;
+        case "complete":
+          break;
       }
+    }
 
-      if (data.type === "content") {
-        document.getElementById("output").textContent += data.content;
-      }
+    async function showApprovalDialog({ toolName, approvalId, arguments: args }) {
+      const approved = confirm(
+        `Allow ${toolName}?\nArguments: ${JSON.stringify(args, null, 2)}`
+      );
 
-      if (data.type === "tool_complete") {
-        console.log(`tool ${data.name} completed:`, data.result);
+      await fetch(`/approve/${approvalId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approved }),
+      });
+    }
+
+    async function chat(threadId, message) {
+      const res = await fetch(`/chat/${threadId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = JSON.parse(line.slice(6));
+          handleEvent(data.type, data);
+        }
       }
-    };
+    }
+
+    chat("user-123", "what's the weather in NYC?");
     ```
 
-    The client receives a `tool_approval_required` event, shows a confirmation dialog, and posts the approval decision back to the server.
+    The client handles the full event lifecycle - content streaming, tool status tracking, and approval flows. When the server sends a `tool_approval_required` event, the client shows a confirmation dialog and posts the decision back.
 
 **To approve**: `{ approved: true }`
 
@@ -301,5 +360,3 @@ scope(
 ```
 
 Stream events fire during the approval flow. `tool_calls_ready` fires before approval, and `tool_executing` fires after approval is granted.
-
-next: [helpers](helpers.md)

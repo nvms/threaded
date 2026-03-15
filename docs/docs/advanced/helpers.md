@@ -25,55 +25,100 @@ Runs the model until no tools are called (agentic loop).
 Checks if a specific tool was called.
 
 ```javascript
-import { toolWasCalled, when } from "@threaded/ai";
+import { compose, scope, model, when, tap, noToolsCalled, toolWasCalled, Inherit } from "@threaded/ai";
 
 compose(
-  model(),
+  scope(
+    {
+      inherit: Inherit.All,
+      tools: [searchWeb],
+      until: noToolsCalled(),
+    },
+    model(),
+  ),
+
   when(
     toolWasCalled("search_web"),
-    tap((ctx) => console.log("model searched the web")),
+    tap(async (ctx) => {
+      const results = ctx.lastResponse.tool_calls
+        .filter((c) => c.function.name === "search_web")
+        .map((c) => JSON.parse(c.function.arguments));
+      await db.insert("search_log", { thread: ctx.threadId, queries: results, ts: Date.now() });
+    }),
   ),
 );
 ```
 
-Returns true if the specified tool was called in the model's last response.
+Logs every search query the model makes to a database for analytics. Returns true if the specified tool was called in the model's last response.
 
 ## everyNMessages
 
 Triggers a step every N messages.
 
 ```javascript
-import { everyNMessages, model } from "@threaded/ai";
+import { compose, scope, model, tap, everyNMessages, Inherit } from "@threaded/ai";
+import { z } from "zod";
 
 compose(
   everyNMessages(
-    10,
-    model({ system: "summarize the last 10 messages" }),
-    tap(({ lastResponse }) => console.log("model's summarization:", lastResponse.content))
+    20,
+    compose(
+      scope(
+        {
+          inherit: Inherit.Conversation,
+          system: "extract all action items, decisions, and open questions from this conversation as JSON",
+          schema: z.object({
+            actionItems: z.array(z.object({ owner: z.string(), task: z.string() })),
+            decisions: z.array(z.string()),
+            openQuestions: z.array(z.string()),
+          }),
+          silent: true,
+        },
+        model(),
+      ),
+      tap(async (ctx) => {
+        await db.upsert("meeting_notes", ctx.threadId, JSON.parse(ctx.lastResponse.content));
+      }),
+    ),
   ),
   model(),
 );
 ```
 
-Runs the summarization step every 10 messages.
+Every 20 messages, extracts structured meeting notes from the conversation and persists them to a database without interrupting the chat.
 
 ## everyNTokens
 
-Triggers a step based on token count.
+Triggers a step based on token count. Since every step receives a `ConversationContext` and returns a new one, you can replace `ctx.history` to compress the conversation.
 
 ```javascript
-import { everyNTokens } from "@threaded/ai";
+import { compose, scope, model, everyNTokens, Inherit } from "@threaded/ai";
 
 compose(
   everyNTokens(
     1_000_000,
-    model({ system: "compress conversation history" }),
+    compose(
+      scope(
+        {
+          inherit: Inherit.Conversation,
+          system: "summarize this entire conversation into a single, dense message. preserve all key facts, decisions, and context.",
+          silent: true,
+        },
+        model(),
+      ),
+      async (ctx) => ({
+        ...ctx,
+        history: [
+          { role: "assistant", content: ctx.lastResponse.content },
+        ],
+      }),
+    ),
   ),
   model(),
 );
 ```
 
-Estimates tokens as length / 4.
+The `scope` with `silent: true` runs the summarization without appending to the outer history. The next step replaces `ctx.history` with just the summary, compressing the entire conversation into a single message. Estimates tokens as length / 4.
 
 ## appendToLastRequest
 
@@ -113,8 +158,8 @@ Reminds the model about available tools.
 ```javascript
 import {
   compose,
-  model,
   scope,
+  model,
   when,
   tap,
   Inherit,
@@ -122,34 +167,50 @@ import {
   everyNMessages,
   toolWasCalled,
 } from "@threaded/ai";
+import { z } from "zod";
 
-const workflow = compose(
+const supportAgent = compose(
   everyNMessages(
-    20,
-    scope(
-      {
-        inherit: Inherit.Conversation,
-        system: "create a brief summary of the conversation",
-        silent: true,
-      },
-      model(),
+    10,
+    compose(
+      scope(
+        {
+          inherit: Inherit.Conversation,
+          system: "extract ticket metadata from this conversation as JSON",
+          schema: z.object({
+            sentiment: z.enum(["positive", "neutral", "frustrated", "angry"]),
+            topics: z.array(z.string()),
+            resolved: z.boolean(),
+          }),
+          silent: true,
+        },
+        model(),
+      ),
+      tap(async (ctx) => {
+        await db.upsert("tickets", ctx.threadId, JSON.parse(ctx.lastResponse.content));
+      }),
     ),
   ),
 
   scope(
     {
       inherit: Inherit.All,
-      tools: [search, calculator, weather],
+      tools: [orderLookup, knowledgeBase, escalateToHuman],
       until: noToolsCalled(),
     },
     model(),
   ),
 
   when(
-    toolWasCalled("search_web"),
-    tap((ctx) => console.log("search was used")),
+    toolWasCalled("escalate_to_human"),
+    tap(async (ctx) => {
+      await slack.post("#support-escalations", {
+        thread: ctx.threadId,
+        summary: ctx.lastResponse.content,
+      });
+    }),
   ),
 );
 ```
 
-Helpers compose together for complex behaviors.
+A customer support agent that periodically extracts ticket metadata to a database, uses tools in an agentic loop to look up orders and knowledge base articles, and posts to Slack when it escalates to a human.

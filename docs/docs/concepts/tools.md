@@ -371,5 +371,3 @@ Shows tool execution progress in the terminal.
 When building interactive applications, you often want user approval before executing tools. Streaming and approval work together - stream events let the UI show what tools are being called, then approval lets users decide whether to allow them.
 
 See [tool approval](../advanced/approval.md) for the full frontend/backend approval flow with SSE.
-
-next: [schemas](schemas.md)
