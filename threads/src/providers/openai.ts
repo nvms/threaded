@@ -1,14 +1,12 @@
 import { ConversationContext, Message, ProviderConfig } from "../types";
 import { addUsage, getKey } from "../utils";
 
-const getApiKey = (configApiKey?: string): string => {
+const getApiKey = (configApiKey?: string): string | undefined => {
   if (configApiKey) return configApiKey;
   try {
     return getKey("openai");
   } catch {
-    const key = process.env.OPENAI_API_KEY || "";
-    if (!key) throw new Error("OpenAI API key not found");
-    return key;
+    return process.env.OPENAI_API_KEY || undefined;
   }
 };
 
@@ -36,8 +34,9 @@ export const callOpenAI = async (
   config: ProviderConfig,
   ctx: ConversationContext,
 ): Promise<ConversationContext> => {
-  const { model, instructions, schema, apiKey: configApiKey } = config;
+  const { model, instructions, schema, apiKey: configApiKey, baseUrl } = config;
   const apiKey = getApiKey(configApiKey);
+  const endpoint = baseUrl || "https://api.openai.com/v1";
 
   const messages = [];
   if (instructions) {
@@ -68,12 +67,17 @@ export const callOpenAI = async (
     body.tool_choice = "auto";
   }
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (apiKey) {
+    headers["Authorization"] = `Bearer ${apiKey}`;
+  }
+
+  const response = await fetch(`${endpoint}/chat/completions`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
+    headers,
     body: JSON.stringify(body),
     signal: ctx.abortSignal,
   });

@@ -3,7 +3,7 @@ import { callOpenAI } from "../src/providers/openai";
 import { callAnthropic } from "../src/providers/anthropic";
 import { callGoogle } from "../src/providers/google";
 import { callXAI } from "../src/providers/xai";
-import { callLocal } from "../src/providers/local";
+import { callOpenAI } from "../src/providers/openai";
 import { ConversationContext, StreamEvent } from "../src/types";
 import { scope } from "../src/composition/scope";
 import { model } from "../src/composition/model";
@@ -288,7 +288,7 @@ describe("xAI usage tracking", () => {
   });
 });
 
-describe("Local/Ollama usage tracking", () => {
+describe("Ollama usage tracking", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn());
   });
@@ -301,7 +301,7 @@ describe("Local/Ollama usage tracking", () => {
       mockOpenAIResponse({ prompt_tokens: 16, completion_tokens: 1, total_tokens: 17 })
     );
 
-    const result = await callLocal({ model: "llama3" }, baseCtx());
+    const result = await callOpenAI({ model: "llama3", baseUrl: "http://localhost:11434/v1" }, baseCtx());
     expect(result.usage).toEqual({ promptTokens: 16, completionTokens: 1, totalTokens: 17 });
   });
 });

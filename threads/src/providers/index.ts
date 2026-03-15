@@ -5,7 +5,7 @@ import { callAnthropic } from "./anthropic";
 import { callGoogle } from "./google";
 import { callHuggingFace } from "./huggingface";
 import { callXAI } from "./xai";
-import { callLocal } from "./local";
+
 
 export const callProvider = async (
   config: ProviderConfig,
@@ -23,8 +23,8 @@ export const callProvider = async (
       return callGoogle(providerConfig, ctx);
     case "xai":
       return callXAI(providerConfig, ctx);
-    case "local":
-      return callLocal(providerConfig, ctx);
+    case "ollama":
+      return callOpenAI({ ...providerConfig, baseUrl: providerConfig.baseUrl || "http://localhost:11434/v1" }, ctx);
     case "huggingface":
       return callHuggingFace(providerConfig, ctx);
     default:

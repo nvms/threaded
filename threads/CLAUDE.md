@@ -62,7 +62,7 @@ make build     # compile typescript
 - anthropic/claude-sonnet-4-5-20250929, etc.
 - google/gemini-2.0-flash, etc.
 - xai/grok-3, etc.
-- local/llama2 (ollama)
+- ollama/llama2
 - HuggingFace/model-name (local transformers)
 
 ## testing
