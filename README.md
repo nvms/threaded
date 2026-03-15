@@ -1,6 +1,10 @@
-# @threaded/ai
+<p align="center">
+  <img src="logo.svg" width="80" height="80" alt="threads logo">
+</p>
 
-Composable LLM workflows for Node.js. Multi-provider support, tool execution, streaming, structured output, and approval workflows.
+<h1 align="center">@threaded/ai</h1>
+
+<p align="center">Composable LLM workflows for Node.js. Multi-provider support, tool execution, streaming, structured output, and approval workflows.</p>
 
 ## Installation
 
