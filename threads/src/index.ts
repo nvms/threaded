@@ -13,5 +13,4 @@ export * from "./composition/when";
 export * from "./composition/model";
 export * from "./composition/retry";
 export * from "./composition/scope";
-export * from "./utils/rateLimited";
 export * from "./composition/compose";

@@ -33,8 +33,6 @@ src/
     xai.ts                  - xAI Grok
     local.ts                - Ollama (local)
     huggingface.ts          - HuggingFace Transformers (local)
-  utils/
-    rateLimited.ts          - token bucket rate limiter
 tests/
 ```
 
