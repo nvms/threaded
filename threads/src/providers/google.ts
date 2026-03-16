@@ -20,18 +20,6 @@ export const callGoogle = async (
   const apiKey = getApiKey(configApiKey);
 
   const contents = [];
-
-  if (instructions) {
-    contents.push({
-      role: "user",
-      parts: [{ text: instructions }],
-    });
-    contents.push({
-      role: "model",
-      parts: [{ text: "I understand." }],
-    });
-  }
-
   const toolCallMap = new Map<string, string>();
 
   for (let i = 0; i < ctx.history.length; i++) {
@@ -101,9 +89,13 @@ export const callGoogle = async (
     }
   }
 
-  const body: any = {
-    contents,
-  };
+  const body: any = { contents };
+
+  if (instructions) {
+    body.systemInstruction = {
+      parts: [{ text: instructions }],
+    };
+  }
 
   if (ctx.tools && ctx.tools.length > 0) {
     body.tools = [

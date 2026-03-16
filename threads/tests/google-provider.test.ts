@@ -219,7 +219,7 @@ describe("Google provider tool call formatting", () => {
     expect(capturedBody.contents[0].parts[0].text).toBe("Do something");
   });
 
-  it("includes instructions as initial user/model exchange", async () => {
+  it("passes instructions as systemInstruction", async () => {
     const ctx: ConversationContext = {
       history: [{ role: "user", content: "Hello" }],
       tools: [],
@@ -230,10 +230,23 @@ describe("Google provider tool call formatting", () => {
       ctx
     );
 
-    expect(capturedBody.contents).toHaveLength(3);
-    expect(capturedBody.contents[0].parts[0].text).toBe("You are helpful");
-    expect(capturedBody.contents[1].parts[0].text).toBe("I understand.");
-    expect(capturedBody.contents[2].parts[0].text).toBe("Hello");
+    expect(capturedBody.contents).toHaveLength(1);
+    expect(capturedBody.contents[0].parts[0].text).toBe("Hello");
+    expect(capturedBody.systemInstruction).toEqual({
+      parts: [{ text: "You are helpful" }],
+    });
+  });
+
+  it("omits systemInstruction when no instructions provided", async () => {
+    const ctx: ConversationContext = {
+      history: [{ role: "user", content: "Hello" }],
+      tools: [],
+    };
+
+    await callGoogle({ model: "gemini-2.0-flash" }, ctx);
+
+    expect(capturedBody.systemInstruction).toBeUndefined();
+    expect(capturedBody.contents).toHaveLength(1);
   });
 
   it("streaming: formats tool results correctly", async () => {
