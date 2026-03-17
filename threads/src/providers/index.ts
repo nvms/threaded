@@ -1,10 +1,10 @@
-import { ConversationContext, ProviderConfig } from "../types";
-import { parseModelName } from "../utils";
-import { callOpenAI } from "./openai";
-import { callAnthropic } from "./anthropic";
-import { callGoogle } from "./google";
-import { callHuggingFace } from "./huggingface";
-import { callXAI } from "./xai";
+import { ConversationContext, ProviderConfig } from "../types.js";
+import { parseModelName } from "../utils.js";
+import { callOpenAI } from "./openai.js";
+import { callAnthropic } from "./anthropic.js";
+import { callGoogle } from "./google.js";
+import { callHuggingFace } from "./huggingface.js";
+import { callXAI } from "./xai.js";
 
 
 export const callProvider = async (

@@ -1,4 +1,4 @@
-import { StepFunction, ConversationContext, RetryOptions } from "../types";
+import { StepFunction, ConversationContext, RetryOptions } from "../types.js";
 
 /**
  * scope({}, retry({ times: 2 }, model(...)))

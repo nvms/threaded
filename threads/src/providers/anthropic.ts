@@ -1,5 +1,5 @@
-import { ProviderConfig, Message, ConversationContext } from "../types";
-import { addUsage, getKey } from "../utils";
+import { ProviderConfig, Message, ConversationContext } from "../types.js";
+import { addUsage, getKey } from "../utils.js";
 
 const getApiKey = (configApiKey?: string): string => {
   if (configApiKey) return configApiKey;

@@ -1,6 +1,6 @@
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { ToolConfig } from "./types";
-import { convertMCPSchemaToToolSchema } from "./schema";
+import { ToolConfig } from "./types.js";
+import { convertMCPSchemaToToolSchema } from "./schema.js";
 
 export interface MCPConnection {
   tools: ToolConfig[];

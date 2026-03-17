@@ -1,11 +1,11 @@
-import { compose } from "./compose";
+import { compose } from "./compose.js";
 import {
   ConversationContext,
   Inherit,
   ScopeConfig,
   StepFunction,
-} from "../types";
-import { toolConfigToToolDefinition } from "../utils";
+} from "../types.js";
+import { toolConfigToToolDefinition } from "../utils.js";
 
 const scopeContext = (
   config: ScopeConfig,

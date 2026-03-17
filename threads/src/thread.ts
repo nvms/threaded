@@ -4,8 +4,8 @@ import {
   StepFunction,
   ThreadStore,
   Thread,
-} from "./types";
-import { model } from "./composition/model";
+} from "./types.js";
+import { model } from "./composition/model.js";
 
 const createMemoryStore = (): ThreadStore => {
   const store = new Map<string, Message[]>();

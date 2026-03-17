@@ -1,5 +1,5 @@
-import { ConversationContext, StepFunction } from "./types";
-import { when } from "./composition/when";
+import { ConversationContext, StepFunction } from "./types.js";
+import { when } from "./composition/when.js";
 
 /**
  * scope({ until: noToolsCalled() })

@@ -1,4 +1,4 @@
-import { ConversationContext, StepFunction } from "../types";
+import { ConversationContext, StepFunction } from "../types.js";
 
 export const when = (
   condition: (ctx: ConversationContext) => boolean,

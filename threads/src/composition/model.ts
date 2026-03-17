@@ -1,13 +1,13 @@
-import { callProvider } from "../providers";
-import { normalizeSchema } from "../schema";
+import { callProvider } from "../providers/index.js";
+import { normalizeSchema } from "../schema.js";
 import {
   ConversationContext,
   ToolCall,
   JsonSchema,
   StandardSchema,
   ComposedFunction,
-} from "../types";
-import { requestApproval } from "../approval";
+} from "../types.js";
+import { requestApproval } from "../approval.js";
 
 export const model = ({
   model = "openai/gpt-4o-mini",

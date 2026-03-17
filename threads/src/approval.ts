@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { ToolCall } from "./types";
+import { ToolCall } from "./types.js";
 
 export interface ApprovalRequest {
   id: string;

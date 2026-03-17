@@ -1,4 +1,4 @@
-import { ComposedFunction, ConversationContext, StepFunction } from "../types";
+import { ComposedFunction, ConversationContext, StepFunction } from "../types.js";
 
 const enrichContext = (ctx: ConversationContext): ConversationContext => {
   const lastUserMessage = [...ctx.history]

@@ -1,5 +1,5 @@
-import { ConversationContext, Message, ProviderConfig } from "../types";
-import { addUsage } from "../utils";
+import { ConversationContext, Message, ProviderConfig } from "../types.js";
+import { addUsage } from "../utils.js";
 
 const modelCache = new Map<string, any>();
 

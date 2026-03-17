@@ -1,5 +1,5 @@
-import { ImageConfig, ImageResult } from "./types";
-import { getKey, parseModelName } from "./utils";
+import { ImageConfig, ImageResult } from "./types.js";
+import { getKey, parseModelName } from "./utils.js";
 
 const providerKeyEnvVars: Record<string, string> = {
   openai: "OPENAI_API_KEY",

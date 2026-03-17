@@ -1,5 +1,5 @@
-import { ConversationContext, Message, ProviderConfig } from "../types";
-import { addUsage, getKey } from "../utils";
+import { ConversationContext, Message, ProviderConfig } from "../types.js";
+import { addUsage, getKey } from "../utils.js";
 
 const appendToolCalls = (toolCalls: any[], tcchunklist: any[]): any[] => {
   for (const tcchunk of tcchunklist) {

@@ -1,4 +1,4 @@
-import { ConversationContext, StepFunction } from "../types";
+import { ConversationContext, StepFunction } from "../types.js";
 
 export const tap = (
   fn: (ctx: ConversationContext) => Promise<void> | void,

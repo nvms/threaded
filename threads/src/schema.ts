@@ -1,4 +1,4 @@
-import { JsonSchema, SchemaProperty, StandardSchema } from "./types";
+import { JsonSchema, SchemaProperty, StandardSchema } from "./types.js";
 import { z, type ZodType } from "zod";
 
 export const isStandardSchema = (schema: any): schema is StandardSchema => {

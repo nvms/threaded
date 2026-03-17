@@ -5,8 +5,8 @@ import {
   TokenUsage,
   ToolConfig,
   ToolDefinition,
-} from "./types";
-import { isStandardSchema, convertStandardSchemaToSchemaProperties } from "./schema";
+} from "./types.js";
+import { isStandardSchema, convertStandardSchemaToSchemaProperties } from "./schema.js";
 
 export const toolConfigToToolDefinition = (
   tool: ToolConfig,

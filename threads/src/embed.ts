@@ -1,4 +1,4 @@
-import { getKey } from "./utils";
+import { getKey } from "./utils.js";
 
 const modelCache = new Map<string, any>();
 
