@@ -60,7 +60,7 @@ model({ model: "openai/gpt-4o-mini" })
 model({ model: "anthropic/claude-sonnet-4-5-20250929" })
 model({ model: "google/gemini-2.0-flash" })
 model({ model: "xai/grok-3" })
-model({ model: "local/llama2" })       // Ollama
+model({ model: "local/llama2" })
 ```
 
 API keys are resolved in order: `config.apiKey` > `setKeys()` > environment variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
