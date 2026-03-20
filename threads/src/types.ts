@@ -79,6 +79,8 @@ export interface ToolExecutionConfig {
 
 export type StreamEvent =
   | { type: 'content'; content: string }
+  | { type: 'tool_call_start'; index: number; name: string }
+  | { type: 'tool_call_delta'; index: number; name: string; argumentDelta: string; argumentsSoFar: string }
   | { type: 'tool_calls_ready'; calls: ToolCall[] }
   | { type: 'tool_executing'; call: ToolCall }
   | { type: 'tool_complete'; call: ToolCall; result: any }

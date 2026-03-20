@@ -14,7 +14,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@threaded/ai": "^1.0.2",
+    "@threaded/ai": "^2.0.2",
     "fast-glob": "^3.3.3",
     "zod": "^4.1.11"
   }

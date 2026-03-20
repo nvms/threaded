@@ -162,6 +162,27 @@ const handleOpenAIStream = async (
 
             if (delta?.tool_calls) {
               toolCalls = appendToolCalls(toolCalls, delta.tool_calls);
+              if (ctx.stream) {
+                for (const tcchunk of delta.tool_calls) {
+                  if (tcchunk.function?.arguments) {
+                    const tc = toolCalls[tcchunk.index];
+                    ctx.stream({
+                      type: "tool_call_delta",
+                      index: tcchunk.index,
+                      name: tc?.function?.name || "",
+                      argumentDelta: tcchunk.function.arguments,
+                      argumentsSoFar: tc?.function?.arguments || "",
+                    });
+                  }
+                  if (tcchunk.function?.name) {
+                    ctx.stream({
+                      type: "tool_call_start",
+                      index: tcchunk.index,
+                      name: toolCalls[tcchunk.index]?.function?.name || "",
+                    });
+                  }
+                }
+              }
             }
           } catch (e) {
             // skip invalid JSON lines

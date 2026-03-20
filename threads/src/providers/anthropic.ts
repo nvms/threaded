@@ -224,6 +224,13 @@ const handleAnthropicStream = async (
                 },
                 index: parsed.index,
               });
+              if (ctx.stream) {
+                ctx.stream({
+                  type: "tool_call_start",
+                  index: parsed.index,
+                  name: toolUse.name,
+                });
+              }
             }
 
             if (
@@ -233,6 +240,15 @@ const handleAnthropicStream = async (
               const toolCall = toolCalls.find((tc) => tc.index === parsed.index);
               if (toolCall) {
                 toolCall.function.arguments += parsed.delta.partial_json;
+                if (ctx.stream) {
+                  ctx.stream({
+                    type: "tool_call_delta",
+                    index: parsed.index,
+                    name: toolCall.function.name,
+                    argumentDelta: parsed.delta.partial_json,
+                    argumentsSoFar: toolCall.function.arguments,
+                  });
+                }
               }
             }
           } catch (e) {
