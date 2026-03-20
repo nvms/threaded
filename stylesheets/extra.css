@@ -1,0 +1,94 @@
+/* hide site name text but keep layout space */
+.md-header__title {
+  visibility: hidden;
+}
+
+/* force logo to be white */
+.md-logo svg {
+  fill: white !important;
+}
+
+.md-logo svg path {
+  fill: white !important;
+}
+
+/* light mode header background */
+[data-md-color-scheme="default"] .md-header {
+  background-color: hsl(251.17deg 56.52% 36.99%);
+}
+
+/* light mode nav tabs background */
+[data-md-color-scheme="default"] .md-tabs {
+  background-color: hsl(251.17deg 60.48% 31.16%);
+}
+
+/* dark mode header background */
+[data-md-color-scheme="slate"] .md-header {
+  background-color: hsl(251.17deg 56.52% 36.99%);
+}
+
+/* dark mode nav tabs background */
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: hsl(251.17deg 60.48% 31.16%);
+}
+
+/* dark mode background color */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: rgb(0, 0, 0);
+  --md-code-bg-color: hsl(225deg 28.04% 8.04%);
+}
+
+/* dark mode link color */
+[data-md-color-scheme="slate"][data-md-color-primary="black"] {
+  --md-typeset-a-color: #948fff;
+}
+
+/* dark mode headings */
+[data-md-color-scheme="slate"] h1,
+[data-md-color-scheme="slate"] h2,
+[data-md-color-scheme="slate"] h3,
+[data-md-color-scheme="slate"] h4,
+[data-md-color-scheme="slate"] h5,
+[data-md-color-scheme="slate"] h6 {
+  color: white;
+}
+
+/* dark mode nav sections */
+[data-md-color-scheme="slate"] .md-nav__item--section > .md-nav__link[for] {
+  color: white;
+}
+
+/* dark mode nav title */
+[data-md-color-scheme="slate"] .md-nav__title {
+  color: white;
+}
+
+[data-md-color-scheme="default"] {
+  --md-code-bg-color: hsl(0deg 0% 96.93%);
+}
+
+/* light mode headings */
+[data-md-color-scheme="default"] h1,
+[data-md-color-scheme="default"] h2,
+[data-md-color-scheme="default"] h3,
+[data-md-color-scheme="default"] h4,
+[data-md-color-scheme="default"] h5,
+[data-md-color-scheme="default"] h6 {
+  color: black;
+}
+
+/* light mode nav sections */
+[data-md-color-scheme="default"] .md-nav__item--section > .md-nav__link[for] {
+  color: black;
+}
+
+/* light mode nav title */
+[data-md-color-scheme="default"] .md-nav__title {
+  color: black;
+}
+
+/* h1 and h2 font weight */
+.md-typeset h1,
+.md-typeset h2 {
+  font-weight: 400;
+}
