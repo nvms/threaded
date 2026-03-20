@@ -101,7 +101,7 @@ export const callXAI = async (
     ...ctx,
     lastResponse: msg,
     history: [...ctx.history, msg],
-    usage: addUsage(ctx.usage, data.usage?.prompt_tokens || 0, data.usage?.completion_tokens || 0, data.usage?.total_tokens || 0),
+    usage: addUsage(ctx.usage, data.usage?.prompt_tokens || 0, data.usage?.completion_tokens || 0, data.usage?.total_tokens || 0, data.usage?.prompt_tokens_details?.cached_tokens || 0),
   };
 };
 
@@ -175,7 +175,7 @@ const handleXAIStream = async (
     msg.tool_calls = toolCalls;
   }
 
-  const usage = addUsage(ctx.usage, streamUsage?.prompt_tokens || 0, streamUsage?.completion_tokens || 0, streamUsage?.total_tokens || 0);
+  const usage = addUsage(ctx.usage, streamUsage?.prompt_tokens || 0, streamUsage?.completion_tokens || 0, streamUsage?.total_tokens || 0, streamUsage?.prompt_tokens_details?.cached_tokens || 0);
 
   if (ctx.stream && streamUsage) {
     ctx.stream({ type: "usage", usage });

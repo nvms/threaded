@@ -151,12 +151,13 @@ export const callAnthropic = async (
 
   const inputTokens = data.usage?.input_tokens || 0;
   const outputTokens = data.usage?.output_tokens || 0;
+  const cachedTokens = data.usage?.cache_read_input_tokens || 0;
 
   return {
     ...ctx,
     lastResponse: msg,
     history: [...ctx.history, msg],
-    usage: addUsage(ctx.usage, inputTokens, outputTokens, inputTokens + outputTokens),
+    usage: addUsage(ctx.usage, inputTokens, outputTokens, inputTokens + outputTokens, cachedTokens),
   };
 };
 
@@ -172,6 +173,7 @@ const handleAnthropicStream = async (
   let buffer = "";
   let inputTokens = 0;
   let outputTokens = 0;
+  let cachedTokens = 0;
 
   try {
     while (true) {
@@ -197,6 +199,7 @@ const handleAnthropicStream = async (
 
             if (parsed.type === "message_start" && parsed.message?.usage) {
               inputTokens = parsed.message.usage.input_tokens || 0;
+              cachedTokens = parsed.message.usage.cache_read_input_tokens || 0;
             }
 
             if (parsed.type === "message_delta" && parsed.usage) {
@@ -270,7 +273,7 @@ const handleAnthropicStream = async (
     msg.tool_calls = toolCalls.map(({ index, ...tc }) => tc);
   }
 
-  const usage = addUsage(ctx.usage, inputTokens, outputTokens, inputTokens + outputTokens);
+  const usage = addUsage(ctx.usage, inputTokens, outputTokens, inputTokens + outputTokens, cachedTokens);
 
   if (ctx.stream && (inputTokens || outputTokens)) {
     ctx.stream({ type: "usage", usage });

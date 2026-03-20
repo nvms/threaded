@@ -171,7 +171,7 @@ export const callGoogle = async (
     ...ctx,
     lastResponse: msg,
     history: [...ctx.history, msg],
-    usage: addUsage(ctx.usage, um?.promptTokenCount || 0, um?.candidatesTokenCount || 0, um?.totalTokenCount || 0),
+    usage: addUsage(ctx.usage, um?.promptTokenCount || 0, um?.candidatesTokenCount || 0, um?.totalTokenCount || 0, um?.cachedContentTokenCount || 0),
   };
 };
 
@@ -260,7 +260,7 @@ const handleGoogleStream = async (
   }
 
   const um = usageMetadata;
-  const usage = addUsage(ctx.usage, um?.promptTokenCount || 0, um?.candidatesTokenCount || 0, um?.totalTokenCount || 0);
+  const usage = addUsage(ctx.usage, um?.promptTokenCount || 0, um?.candidatesTokenCount || 0, um?.totalTokenCount || 0, um?.cachedContentTokenCount || 0);
 
   if (ctx.stream && um) {
     ctx.stream({ type: "usage", usage });

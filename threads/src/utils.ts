@@ -103,8 +103,10 @@ export const addUsage = (
   promptTokens: number,
   completionTokens: number,
   totalTokens: number,
+  cachedTokens: number = 0,
 ): TokenUsage => ({
   promptTokens: (existing?.promptTokens || 0) + promptTokens,
   completionTokens: (existing?.completionTokens || 0) + completionTokens,
   totalTokens: (existing?.totalTokens || 0) + totalTokens,
+  cachedTokens: (existing?.cachedTokens || 0) + cachedTokens,
 });

@@ -40,13 +40,13 @@ const mockGoogleResponse = (usageMetadata?: any) => ({
 describe("addUsage", () => {
   it("accumulates from undefined", () => {
     const result = addUsage(undefined, 10, 20, 30);
-    expect(result).toEqual({ promptTokens: 10, completionTokens: 20, totalTokens: 30 });
+    expect(result).toEqual({ cachedTokens: 0, promptTokens: 10, completionTokens: 20, totalTokens: 30 });
   });
 
   it("accumulates onto existing", () => {
     const existing = { promptTokens: 5, completionTokens: 10, totalTokens: 15 };
     const result = addUsage(existing, 10, 20, 30);
-    expect(result).toEqual({ promptTokens: 15, completionTokens: 30, totalTokens: 45 });
+    expect(result).toEqual({ cachedTokens: 0, promptTokens: 15, completionTokens: 30, totalTokens: 45 });
   });
 });
 
@@ -66,14 +66,14 @@ describe("OpenAI usage tracking", () => {
     );
 
     const result = await callOpenAI({ model: "gpt-4o-mini" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 10, completionTokens: 20, totalTokens: 30 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 10, completionTokens: 20, totalTokens: 30 });
   });
 
   it("handles missing usage gracefully", async () => {
     (fetch as any).mockResolvedValue(mockOpenAIResponse());
 
     const result = await callOpenAI({ model: "gpt-4o-mini" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 0, completionTokens: 0, totalTokens: 0 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0 });
   });
 
   it("accumulates usage across calls", async () => {
@@ -89,7 +89,7 @@ describe("OpenAI usage tracking", () => {
     );
 
     ctx = await callOpenAI({ model: "gpt-4o-mini" }, ctx);
-    expect(ctx.usage).toEqual({ promptTokens: 25, completionTokens: 45, totalTokens: 70 });
+    expect(ctx.usage).toEqual({ cachedTokens: 0, promptTokens: 25, completionTokens: 45, totalTokens: 70 });
   });
 
   it("extracts usage from streaming response", async () => {
@@ -121,10 +121,10 @@ describe("OpenAI usage tracking", () => {
     const ctx = { ...baseCtx(), stream: (e: StreamEvent) => events.push(e) };
 
     const result = await callOpenAI({ model: "gpt-4o-mini" }, ctx);
-    expect(result.usage).toEqual({ promptTokens: 10, completionTokens: 5, totalTokens: 15 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 10, completionTokens: 5, totalTokens: 15 });
     expect(events.find(e => e.type === "usage")).toEqual({
       type: "usage",
-      usage: { promptTokens: 10, completionTokens: 5, totalTokens: 15 },
+      usage: { cachedTokens: 0, promptTokens: 10, completionTokens: 5, totalTokens: 15 },
     });
   });
 
@@ -164,14 +164,14 @@ describe("Anthropic usage tracking", () => {
     );
 
     const result = await callAnthropic({ model: "claude-sonnet-4-5-20250929" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 25, completionTokens: 15, totalTokens: 40 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 25, completionTokens: 15, totalTokens: 40 });
   });
 
   it("handles missing usage gracefully", async () => {
     (fetch as any).mockResolvedValue(mockAnthropicResponse());
 
     const result = await callAnthropic({ model: "claude-sonnet-4-5-20250929" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 0, completionTokens: 0, totalTokens: 0 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0 });
   });
 
   it("extracts usage from streaming response", async () => {
@@ -202,7 +202,7 @@ describe("Anthropic usage tracking", () => {
     const ctx = { ...baseCtx(), stream: (e: StreamEvent) => events.push(e) };
 
     const result = await callAnthropic({ model: "claude-sonnet-4-5-20250929" }, ctx);
-    expect(result.usage).toEqual({ promptTokens: 25, completionTokens: 15, totalTokens: 40 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 25, completionTokens: 15, totalTokens: 40 });
 
     const usageEvent = events.find(e => e.type === "usage") as any;
     expect(usageEvent.usage.promptTokens).toBe(25);
@@ -226,14 +226,14 @@ describe("Google usage tracking", () => {
     );
 
     const result = await callGoogle({ model: "gemini-2.0-flash" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 9, completionTokens: 87, totalTokens: 96 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 9, completionTokens: 87, totalTokens: 96 });
   });
 
   it("handles missing usageMetadata gracefully", async () => {
     (fetch as any).mockResolvedValue(mockGoogleResponse());
 
     const result = await callGoogle({ model: "gemini-2.0-flash" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 0, completionTokens: 0, totalTokens: 0 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0 });
   });
 
   it("extracts usage from streaming response", async () => {
@@ -263,7 +263,7 @@ describe("Google usage tracking", () => {
     const ctx = { ...baseCtx(), stream: (e: StreamEvent) => events.push(e) };
 
     const result = await callGoogle({ model: "gemini-2.0-flash" }, ctx);
-    expect(result.usage).toEqual({ promptTokens: 9, completionTokens: 5, totalTokens: 14 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 9, completionTokens: 5, totalTokens: 14 });
     expect(events.find(e => e.type === "usage")).toBeDefined();
   });
 });
@@ -284,7 +284,7 @@ describe("xAI usage tracking", () => {
     );
 
     const result = await callXAI({ model: "grok-3" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 37, completionTokens: 530, totalTokens: 567 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 37, completionTokens: 530, totalTokens: 567 });
   });
 });
 
@@ -302,7 +302,7 @@ describe("Ollama usage tracking", () => {
     );
 
     const result = await callOpenAI({ model: "llama3", baseUrl: "http://localhost:11434/v1" }, baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 16, completionTokens: 1, totalTokens: 17 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 16, completionTokens: 1, totalTokens: 17 });
   });
 });
 
@@ -323,7 +323,7 @@ describe("scope usage propagation", () => {
 
     const step = scope({}, model({ model: "openai/gpt-4o-mini" }));
     const result = await step(baseCtx());
-    expect(result.usage).toEqual({ promptTokens: 10, completionTokens: 20, totalTokens: 30 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 10, completionTokens: 20, totalTokens: 30 });
   });
 
   it("propagates usage from silent scopes", async () => {
@@ -335,7 +335,7 @@ describe("scope usage propagation", () => {
     const result = await step(baseCtx());
 
     expect(result.history).toHaveLength(1);
-    expect(result.usage).toEqual({ promptTokens: 10, completionTokens: 20, totalTokens: 30 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 10, completionTokens: 20, totalTokens: 30 });
   });
 
   it("accumulates usage across nested scopes", async () => {
@@ -355,7 +355,7 @@ describe("scope usage propagation", () => {
     );
     const result = await step(baseCtx());
 
-    expect(result.usage).toEqual({ promptTokens: 30, completionTokens: 60, totalTokens: 90 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 30, completionTokens: 60, totalTokens: 90 });
   });
 
   it("carries pre-existing usage into scoped context", async () => {
@@ -370,6 +370,6 @@ describe("scope usage propagation", () => {
     const step = scope({}, model({ model: "openai/gpt-4o-mini" }));
     const result = await step(ctx);
 
-    expect(result.usage).toEqual({ promptTokens: 110, completionTokens: 220, totalTokens: 330 });
+    expect(result.usage).toEqual({ cachedTokens: 0, promptTokens: 110, completionTokens: 220, totalTokens: 330 });
   });
 });
