@@ -1,0 +1,32 @@
+# threads
+
+> composable llm workflows for node.js
+
+threads is a library for building composable LLM workflows in node.js.
+it provides primitives for managing conversation history, tool execution,
+and function composition. supports openai, anthropic, google, and xai models.
+includes built-in streaming, tool approval, retry logic, thread persistence,
+text embeddings, image generation, and multimodal input (image, pdf, audio).
+
+
+## Getting Started
+
+- [Home](https://nvms.github.io/threaded-ai/index.md): overview and core principles
+- [Quick Start](https://nvms.github.io/threaded-ai/quick-start/index.md): installation and basic usage
+
+## Core Concepts
+
+- [Threads](https://nvms.github.io/threaded-ai/concepts/threads/index.md): thread management and persistence
+- [Composition](https://nvms.github.io/threaded-ai/concepts/composition/index.md): composing workflows with compose, model, scope, when, tap, retry
+- [Tools](https://nvms.github.io/threaded-ai/concepts/tools/index.md): defining and executing tools
+- [Schemas](https://nvms.github.io/threaded-ai/concepts/schemas/index.md): json schema output and validation
+
+## Advanced
+
+- [MCP Integration](https://nvms.github.io/threaded-ai/advanced/mcp/index.md): model context protocol integration
+- [Embeddings](https://nvms.github.io/threaded-ai/advanced/embedding/index.md): text embeddings
+- [Image Generation](https://nvms.github.io/threaded-ai/advanced/image-generation/index.md): image generation with openai, xai, google
+- [Multimodal Input](https://nvms.github.io/threaded-ai/advanced/multimodal/index.md): image, pdf, and audio input across providers
+- [Tool Approval](https://nvms.github.io/threaded-ai/advanced/approval/index.md): tool approval system
+- [Helpers](https://nvms.github.io/threaded-ai/advanced/helpers/index.md): utility functions
+
