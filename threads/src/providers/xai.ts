@@ -1,5 +1,39 @@
-import { ConversationContext, Message, ProviderConfig } from "../types.js";
+import { ConversationContext, ContentPart, MediaSource, Message, ProviderConfig } from "../types.js";
 import { addUsage, getKey } from "../utils.js";
+
+const mediaSourceToXAIUrl = (source: MediaSource): string => {
+  if (source.kind === "url") return source.url;
+  return `data:${source.mediaType};base64,${source.data}`;
+};
+
+const toXAIContent = (content: string | ContentPart[]): any => {
+  if (typeof content === "string") return content;
+  return content.map((part) => {
+    if (part.type === "text") return { type: "text", text: part.text };
+    if (part.type === "image") {
+      return {
+        type: "image_url",
+        image_url: { url: mediaSourceToXAIUrl(part.source) },
+      };
+    }
+    if (part.type === "document") {
+      throw new Error("xAI does not support document/PDF input on the chat completions API");
+    }
+    if (part.type === "audio") {
+      throw new Error("xAI does not support audio input on the chat completions API");
+    }
+    return part;
+  });
+};
+
+const toXAIMessages = (history: Message[]): any[] => {
+  return history.map((msg) => {
+    if (msg.role === "user") {
+      return { ...msg, content: toXAIContent(msg.content) };
+    }
+    return msg;
+  });
+};
 
 const appendToolCalls = (toolCalls: any[], tcchunklist: any[]): any[] => {
   for (const tcchunk of tcchunklist) {
@@ -36,11 +70,11 @@ export const callXAI = async (
   const { model, instructions, schema, apiKey: configApiKey } = config;
   const apiKey = getApiKey(configApiKey);
 
-  const messages = [];
+  const messages: any[] = [];
   if (instructions) {
     messages.push({ role: "system", content: instructions });
   }
-  messages.push(...ctx.history);
+  messages.push(...toXAIMessages(ctx.history));
 
   const body: any = {
     model,

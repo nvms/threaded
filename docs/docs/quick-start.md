@@ -116,6 +116,27 @@ const result = await workflow("what's the weather in san francisco?");
 
 The model calls the tool automatically and uses the results in its response.
 
+## Multimodal Input
+
+Attach images, PDFs, or audio to a user message with the `message()` helper.
+
+```typescript
+import { compose, model, message } from "@threaded/ai";
+import { readFileSync } from "fs";
+
+const png = readFileSync("chart.png").toString("base64");
+
+const result = await compose(model({ model: "openai/gpt-4o-mini" }))({
+  history: [
+    message("What's in this chart?", {
+      images: [{ kind: "base64", mediaType: "image/png", data: png }],
+    }),
+  ],
+});
+```
+
+The same message format works across OpenAI, Anthropic, and Google. See [Multimodal Input](advanced/multimodal.md) for PDFs, audio, URLs, and the full capability matrix.
+
 ## Streaming
 
 Stream content and tool execution updates in real time.

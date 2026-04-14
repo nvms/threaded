@@ -1,5 +1,31 @@
-import { ConversationContext, Message, ProviderConfig } from "../types.js";
+import { ConversationContext, ContentPart, Message, ProviderConfig } from "../types.js";
 import { addUsage, getKey } from "../utils.js";
+
+const GOOGLE_MIME_ALIASES: Record<string, string> = {
+  "audio/mp3": "audio/mpeg",
+  "audio/mpeg3": "audio/mpeg",
+  "audio/x-wav": "audio/wav",
+  "audio/wave": "audio/wav",
+};
+
+const normalizeGoogleMime = (mediaType: string): string =>
+  GOOGLE_MIME_ALIASES[mediaType.toLowerCase()] || mediaType;
+
+const toGoogleParts = (content: string | ContentPart[]): any[] => {
+  if (typeof content === "string") return [{ text: content }];
+  return content.map((part) => {
+    if (part.type === "text") return { text: part.text };
+    if (part.source.kind === "base64") {
+      return {
+        inline_data: {
+          mime_type: normalizeGoogleMime(part.source.mediaType),
+          data: part.source.data,
+        },
+      };
+    }
+    return { file_data: { file_uri: part.source.url } };
+  });
+};
 
 const getApiKey = (configApiKey?: string): string => {
   if (configApiKey) return configApiKey;
@@ -84,7 +110,7 @@ export const callGoogle = async (
     } else if (msg.role === "user") {
       contents.push({
         role: "user",
-        parts: [{ text: msg.content }],
+        parts: toGoogleParts(msg.content),
       });
     }
   }

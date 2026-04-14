@@ -56,7 +56,8 @@ export const model = ({
     }
 
     const systemMessage = currentCtx.history.find((m) => m.role === "system");
-    const instructions = systemMessage?.content;
+    const instructions =
+      typeof systemMessage?.content === "string" ? systemMessage.content : undefined;
 
     do {
       if (currentCtx.abortSignal?.aborted) {

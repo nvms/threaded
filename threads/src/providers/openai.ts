@@ -1,5 +1,76 @@
-import { ConversationContext, Message, ProviderConfig } from "../types.js";
+import { ConversationContext, ContentPart, MediaSource, Message, ProviderConfig } from "../types.js";
 import { addUsage, getKey } from "../utils.js";
+
+const mediaSourceToOpenAIUrl = (source: MediaSource): string => {
+  if (source.kind === "url") return source.url;
+  return `data:${source.mediaType};base64,${source.data}`;
+};
+
+const mediaTypeToAudioFormat = (mediaType: string): "wav" | "mp3" => {
+  const mt = mediaType.toLowerCase();
+  if (mt === "audio/wav" || mt === "audio/wave" || mt === "audio/x-wav") return "wav";
+  if (mt === "audio/mp3" || mt === "audio/mpeg" || mt === "audio/mpeg3") return "mp3";
+  throw new Error(`OpenAI audio input only supports wav or mp3, got: ${mediaType}`);
+};
+
+const toOpenAIContent = (content: string | ContentPart[]): any => {
+  if (typeof content === "string") return content;
+  return content.map((part) => {
+    if (part.type === "text") return { type: "text", text: part.text };
+    if (part.type === "image") {
+      return {
+        type: "image_url",
+        image_url: { url: mediaSourceToOpenAIUrl(part.source) },
+      };
+    }
+    if (part.type === "document") {
+      if (part.source.kind !== "base64") {
+        throw new Error(
+          "OpenAI document input requires base64 source; upload via Files API and use a text reference instead",
+        );
+      }
+      return {
+        type: "file",
+        file: {
+          filename: part.filename || "document.pdf",
+          file_data: `data:${part.source.mediaType};base64,${part.source.data}`,
+        },
+      };
+    }
+    if (part.type === "audio") {
+      if (part.source.kind !== "base64") {
+        throw new Error("OpenAI audio input requires base64 source");
+      }
+      return {
+        type: "input_audio",
+        input_audio: {
+          data: part.source.data,
+          format: mediaTypeToAudioFormat(part.source.mediaType),
+        },
+      };
+    }
+    return part;
+  });
+};
+
+const toOpenAIMessages = (history: Message[]): any[] => {
+  return history.map((msg) => {
+    if (msg.role === "user") {
+      return { ...msg, content: toOpenAIContent(msg.content) };
+    }
+    return msg;
+  });
+};
+
+const hasAudioPart = (history: Message[]): boolean => {
+  for (const msg of history) {
+    if (typeof msg.content === "string") continue;
+    for (const part of msg.content) {
+      if (part.type === "audio") return true;
+    }
+  }
+  return false;
+};
 
 const getApiKey = (configApiKey?: string): string | undefined => {
   if (configApiKey) return configApiKey;
@@ -38,17 +109,18 @@ export const callOpenAI = async (
   const apiKey = getApiKey(configApiKey);
   const endpoint = baseUrl || "https://api.openai.com/v1";
 
-  const messages = [];
+  const messages: any[] = [];
   if (instructions) {
     messages.push({ role: "system", content: instructions });
   }
-  messages.push(...ctx.history);
+  messages.push(...toOpenAIMessages(ctx.history));
 
   const body: any = {
     model,
     messages,
     stream: !!ctx.stream,
     ...(ctx.stream && { stream_options: { include_usage: true } }),
+    ...(hasAudioPart(ctx.history) && { modalities: ["text"] }),
   };
 
   if (schema) {

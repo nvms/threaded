@@ -1,5 +1,8 @@
 import {
   ApiKeys,
+  ContentPart,
+  MediaSource,
+  Message,
   ParsedModel,
   SchemaProperty,
   TokenUsage,
@@ -97,6 +100,51 @@ export const maxCalls = (toolConfig: ToolConfig, maxCalls: number): ToolConfig =
   ...toolConfig,
   _maxCalls: maxCalls,
 });
+
+export const getText = (content: string | ContentPart[]): string => {
+  if (typeof content === "string") return content;
+  return content
+    .filter((p): p is Extract<ContentPart, { type: "text" }> => p.type === "text")
+    .map((p) => p.text)
+    .join("");
+};
+
+export const message = (
+  text: string,
+  opts?: {
+    images?: (MediaSource | string)[];
+    documents?: ({ source: MediaSource; filename?: string } | MediaSource | string)[];
+    audio?: MediaSource[];
+  },
+): Message => {
+  const images = opts?.images || [];
+  const documents = opts?.documents || [];
+  const audio = opts?.audio || [];
+  if (images.length === 0 && documents.length === 0 && audio.length === 0) {
+    return { role: "user", content: text };
+  }
+  const parts: ContentPart[] = [{ type: "text", text }];
+  for (const img of images) {
+    if (typeof img === "string") {
+      parts.push({ type: "image", source: { kind: "url", url: img } });
+    } else {
+      parts.push({ type: "image", source: img });
+    }
+  }
+  for (const doc of documents) {
+    if (typeof doc === "string") {
+      parts.push({ type: "document", source: { kind: "url", url: doc } });
+    } else if ("source" in doc) {
+      parts.push({ type: "document", source: doc.source, filename: doc.filename });
+    } else {
+      parts.push({ type: "document", source: doc });
+    }
+  }
+  for (const clip of audio) {
+    parts.push({ type: "audio", source: clip });
+  }
+  return { role: "user", content: parts };
+};
 
 export const addUsage = (
   existing: TokenUsage | undefined,

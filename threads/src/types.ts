@@ -1,6 +1,16 @@
+export type MediaSource =
+  | { kind: "base64"; mediaType: string; data: string }
+  | { kind: "url"; url: string };
+
+export type ContentPart =
+  | { type: "text"; text: string }
+  | { type: "image"; source: MediaSource }
+  | { type: "document"; source: MediaSource; filename?: string }
+  | { type: "audio"; source: MediaSource };
+
 export interface Message {
   role: "system" | "user" | "assistant" | "tool";
-  content: string;
+  content: string | ContentPart[];
   tool_call_id?: string;
 }
 

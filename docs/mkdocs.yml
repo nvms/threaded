@@ -15,7 +15,7 @@ plugins:
         it provides primitives for managing conversation history, tool execution,
         and function composition. supports openai, anthropic, google, and xai models.
         includes built-in streaming, tool approval, retry logic, thread persistence,
-        text embeddings, and image generation.
+        text embeddings, image generation, and multimodal input (image, pdf, audio).
       sections:
         Getting Started:
           - index.md: overview and core principles
@@ -29,6 +29,7 @@ plugins:
           - advanced/mcp.md: model context protocol integration
           - advanced/embedding.md: text embeddings
           - advanced/image-generation.md: image generation with openai, xai, google
+          - advanced/multimodal.md: image, pdf, and audio input across providers
           - advanced/approval.md: tool approval system
           - advanced/helpers.md: utility functions
 
@@ -89,5 +90,6 @@ nav:
     - MCP Integration: advanced/mcp.md
     - Embeddings: advanced/embedding.md
     - Image Generation: advanced/image-generation.md
+    - Multimodal Input: advanced/multimodal.md
     - Tool Approval: advanced/approval.md
     - Helpers: advanced/helpers.md

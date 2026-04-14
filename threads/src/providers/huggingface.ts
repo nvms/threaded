@@ -1,5 +1,5 @@
 import { ConversationContext, Message, ProviderConfig } from "../types.js";
-import { addUsage } from "../utils.js";
+import { addUsage, getText } from "../utils.js";
 
 const modelCache = new Map<string, any>();
 
@@ -9,7 +9,7 @@ const formatMessages = (instructions: string | undefined, history: Message[]) =>
     messages.push({ role: "system", content: instructions });
   }
   for (const msg of history) {
-    messages.push({ role: msg.role, content: msg.content });
+    messages.push({ role: msg.role, content: getText(msg.content) });
   }
   return messages;
 };

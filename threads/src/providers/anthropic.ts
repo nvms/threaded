@@ -1,5 +1,42 @@
-import { ProviderConfig, Message, ConversationContext } from "../types.js";
+import { ProviderConfig, ContentPart, Message, ConversationContext } from "../types.js";
 import { addUsage, getKey } from "../utils.js";
+
+const toAnthropicUserContent = (content: string | ContentPart[]): any => {
+  if (typeof content === "string") return content;
+  return content.map((part) => {
+    if (part.type === "text") return { type: "text", text: part.text };
+    if (part.type === "image") {
+      if (part.source.kind === "base64") {
+        return {
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: part.source.mediaType,
+            data: part.source.data,
+          },
+        };
+      }
+      return { type: "image", source: { type: "url", url: part.source.url } };
+    }
+    if (part.type === "document") {
+      if (part.source.kind === "base64") {
+        return {
+          type: "document",
+          source: {
+            type: "base64",
+            media_type: part.source.mediaType,
+            data: part.source.data,
+          },
+        };
+      }
+      return { type: "document", source: { type: "url", url: part.source.url } };
+    }
+    if (part.type === "audio") {
+      throw new Error("Anthropic does not support audio input on the Messages API");
+    }
+    return part;
+  });
+};
 
 const getApiKey = (configApiKey?: string): string => {
   if (configApiKey) return configApiKey;
@@ -57,6 +94,9 @@ const convertToAnthropicFormat = (messages: any[]): any[] => {
         role: "user",
         content: toolResults,
       });
+    } else if (msg.role === "user") {
+      result.push({ role: "user", content: toAnthropicUserContent(msg.content) });
+      i++;
     } else {
       result.push(msg);
       i++;
@@ -76,7 +116,8 @@ export const callAnthropic = async (
   let system = instructions;
 
   if (ctx.history[0]?.role === "system") {
-    system = ctx.history[0].content;
+    const sc = ctx.history[0].content;
+    system = typeof sc === "string" ? sc : undefined;
   }
 
   const messages = convertToAnthropicFormat(ctx.history);

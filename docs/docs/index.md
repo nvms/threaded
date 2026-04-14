@@ -17,6 +17,7 @@ npm install @threaded/ai
 - Explicit conversation history management
 - Built-in tool execution with approval flows
 - Multi-provider support: OpenAI, Anthropic, Google, xAI, Ollama, HuggingFace
+- Multimodal input (images, PDFs, audio) with provider-agnostic content parts
 - Text embeddings and image generation
 
 Workflows are functions that transform conversation context. Compose them together to build complex agentic behaviors from simple primitives.

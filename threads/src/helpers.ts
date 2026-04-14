@@ -1,4 +1,5 @@
 import { ConversationContext, StepFunction } from "./types.js";
+import { getText } from "./utils.js";
 import { when } from "./composition/when.js";
 
 /**
@@ -31,14 +32,14 @@ export const everyNTokens = (n: number, step: StepFunction): StepFunction => {
   return when(
     (ctx) => {
       const totalTokens = ctx.history.reduce(
-        (acc, msg) => acc + Math.ceil(msg.content.length / 4),
+        (acc, msg) => acc + Math.ceil(getText(msg.content).length / 4),
         0,
       );
       return Math.floor(totalTokens / n) > Math.floor(lastTriggeredAt / n);
     },
     async (ctx) => {
       const totalTokens = ctx.history.reduce(
-        (acc, msg) => acc + Math.ceil(msg.content.length / 4),
+        (acc, msg) => acc + Math.ceil(getText(msg.content).length / 4),
         0,
       );
       lastTriggeredAt = totalTokens;
@@ -60,9 +61,13 @@ export const appendToLastRequest = (content: string): StepFunction => {
     if (lastUserIndex === -1) return ctx;
 
     const newHistory = [...ctx.history];
+    const existing = newHistory[lastUserIndex].content;
     newHistory[lastUserIndex] = {
       ...newHistory[lastUserIndex],
-      content: newHistory[lastUserIndex].content + content,
+      content:
+        typeof existing === "string"
+          ? existing + content
+          : [...existing, { type: "text", text: content }],
     };
 
     return {
